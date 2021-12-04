@@ -16,7 +16,7 @@ async def pager(string, function):
         await function(line)
 
 users = set()
-already_picked = {}
+already_matched = {}
 
 @client.event
 async def on_ready():
