@@ -7,8 +7,11 @@ import textwrap
 
 import random
 
-client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
 
+client = discord.Client(intents=intents)
 
 async def pager(string, function):
     stringWrapped = textwrap.wrap(str(string), 2000, replace_whitespace=False)
@@ -16,6 +19,7 @@ async def pager(string, function):
         await function(line)
 
 users = set()
+user_dict = dict()
 already_matched = {}
 
 @client.event
@@ -24,14 +28,31 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if message.author == client.user:
+        return
+    #if not message.content.startswith("/"):
+    #    return
     globals().update(locals())
 
     global users
+    global user_dict
+    global already_matched
+    try: user_dict[str(message.author)]
+    except: pass
+    try: already_matched[message.author]
+    except KeyError:
+        already_matched[message.author] = set([message.author])
+    
+
     if message.content.startswith("/add"):
         try: await message.delete()
         except:pass
-        users.add(message.author)
         dm = await message.author.create_dm()
+        try: message.author.status
+        except: 
+            await dm.send("Failed, did you send the command in a DM? (this command doesn't work through DMs)")
+            return
+        users.add(message.author)
         await dm.send("Added. To leave the list type /remove")
 
     if message.content.startswith("/remove"):
@@ -42,15 +63,25 @@ async def on_message(message):
         await dm.send("Removed.")
 
     if message.content.startswith("/match"):
-        while True:
-            try: await message.delete()
-            except: pass
-            stranger = random.choice(list(users))
-            #if stranger == message.author:
-            #    continue
-            await stranger.send(f"You have been picked by {str(message.author)}")
-            break
+        try: await message.delete()
+        except: pass
+        #this is so dumb
+        shuffled_users=list(users)
+        random.shuffle(shuffled_users)
+        for stranger in shuffled_users:
+            if stranger in already_matched[message.author]:
+                continue
+            else:
+                already_matched[message.author].add(stranger)
+                await stranger.send(f"You have been matched with {str(message.author)}")
+                await message.author.send(f"You have been matched with {str(stranger)}")
+                return
+        await message.author.send("Noone seems to be online at the moment, please try again later.")
 
+    if message.content.startswith("/backup"):
+        print(f"users = {users}")
+        print(f"user_dict = {user_dict}")
+        print(f"already_matched = {already_matched}")
 
     if message.content.startswith("%"):
         try:
