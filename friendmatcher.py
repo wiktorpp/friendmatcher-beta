@@ -71,6 +71,8 @@ async def on_message(message):
         for stranger in shuffled_users:
             if stranger in already_matched[message.author]:
                 continue
+            elif not (str(stranger.status) == "online" or str(stranger.status) == "idle"):
+                continue
             else:
                 already_matched[message.author].add(stranger)
                 await stranger.send(f"You have been matched with {str(message.author)}")
