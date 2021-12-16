@@ -43,8 +43,15 @@ async def on_message(message):
     except KeyError:
         already_matched[message.author] = set([message.author])
     
+    if message.content.startswith("/help"):
+        await message.channel.send(
+            "Aviable commands: "
+            "/enable"
+            "/disable"
+            "/match"
+        )
 
-    if message.content.startswith("/add"):
+    if message.content.startswith("/enable"):
         try: await message.delete()
         except:pass
         dm = await message.author.create_dm()
@@ -53,14 +60,14 @@ async def on_message(message):
             await dm.send("Failed, did you send the command in a DM? (this command doesn't work through DMs)")
             return
         users.add(message.author)
-        await dm.send("Added. To leave the list type /remove")
+        await dm.send("Enabled. To leave the list type /remove")
 
-    if message.content.startswith("/remove"):
+    if message.content.startswith("/disable"):
         try: await message.delete()
         except: pass
         users.remove(message.author)
         dm = await message.author.create_dm()
-        await dm.send("Removed.")
+        await dm.send("Disabled.")
 
     if message.content.startswith("/match"):
         try: await message.delete()
@@ -119,3 +126,4 @@ async def on_message(message):
 
 client.run(TOKEN)
 
+#https://discord.com/oauth2/authorize?client_id=738728621459505184&permissions=8
