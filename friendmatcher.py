@@ -37,39 +37,41 @@ async def on_message(message):
     global users
     global user_dict
     global already_matched
-    try: user_dict[str(message.author)]
+    try: user_dict[message.author.id]
     except: pass
     try: already_matched[message.author]
     except KeyError:
         already_matched[message.author] = set([message.author])
-    
-    if message.content.startswith("/help"):
+
+    if message.content.startswith(".help"):
         await message.channel.send(
-            "Aviable commands: "
-            "/enable"
-            "/disable"
-            "/match"
+            "Aviable commands:\n"
+            ".enable\n"
+            ".disable\n"
+            ".match\n"
         )
 
-    if message.content.startswith("/enable"):
+    if message.content.startswith(".enable"):
         try: await message.delete()
         except:pass
         dm = await message.author.create_dm()
         try: message.author.status
         except: 
-            await dm.send("Failed, did you send the command in a DM? (this command doesn't work through DMs)")
+            await dm.send(
+                "Failed, did you send the command in a DM? (this command doesn't work through DMs)"
+            )
             return
         users.add(message.author)
-        await dm.send("Enabled. To leave the list type /remove")
+        await dm.send("Enabled. To leave the list type .remove")
 
-    if message.content.startswith("/disable"):
+    if message.content.startswith(".disable"):
         try: await message.delete()
         except: pass
         users.remove(message.author)
         dm = await message.author.create_dm()
         await dm.send("Disabled.")
 
-    if message.content.startswith("/match"):
+    if message.content.startswith(".match"):
         try: await message.delete()
         except: pass
         #this is so dumb
@@ -87,11 +89,11 @@ async def on_message(message):
                 return
         await message.author.send("Noone seems to be online at the moment, please try again later.")
 
-    if message.content.startswith("/backup"):
+    if message.content.startswith(".backup"):
         print(f"users = {users}")
         print(f"user_dict = {user_dict}")
         print(f"already_matched = {already_matched}")
-
+    
     if message.content.startswith("%"):
         try:
             old_stdout = sys.stdout
