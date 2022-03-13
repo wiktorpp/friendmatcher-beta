@@ -20,10 +20,48 @@ async def pager(string, function):
         await function(line)
 
 users_enabled = set()
-users_elevated_priviledges = dict()
+user_id_to_priviledged_user = dict()
 already_matched = {}
 
 react_messages = []
+
+async def add_user_to_database_if_not_already_there(user_id):
+    global already_matched
+    try: already_matched[user_id]
+    except KeyError:
+        already_matched[user_id] = set([user_id])
+
+async def get_permission_from_user(user):
+    global user_id_to_priviledged_user
+
+    with open("dm.txt", "a+") as file :
+        file.write(str(user.id) + "\n")
+
+    user_id_to_priviledged_user[user.id]=user
+    #print("success")
+    #print(user_id_to_priviledged_user)
+    #TODO: send welcome message
+
+    #will raise exception if getting permission failed
+    user_id_to_priviledged_user[user.id].status
+    dm = await user.create_dm()
+    await dm.send(
+        "Permissions granted. For aviable commands type .help"
+    )
+
+async def enable_service_for_user(user):
+    global users_enabled
+    dm = await message.author.create_dm()
+    try: user_id_to_priviledged_user[message.author.id].status
+    except: 
+        await dm.send(
+            "Failed, permissions not granted\n"
+            "https://discord.gg/cgTQFtzrry"
+        )
+        #TODO: Change this message
+        return
+    users_enabled.add(user.id)
+    await dm.send("Enabled. To leave the list type .disable or .dis")
 
 @client.event
 async def on_ready():
@@ -39,29 +77,17 @@ async def on_message(message):
     globals().update(locals())
 
     global users_enabled
-    global users_elevated_priviledges
+    global user_id_to_priviledged_user
     global already_matched
-    try: already_matched[message.author.id]
-    except KeyError:
-        already_matched[message.author.id] = set([message.author.id])
     
-    if message.content.startswith(".grant"):
-        with open("dm.txt", "a+") as file :
-            file.write(str(message.author.id) + "\n")
+    await add_user_to_database_if_not_already_there(message.author.id)
 
-        users_elevated_priviledges[message.author.id]=message.author
-        #print("success")
-        #print(users_elevated_priviledges)
-        #TODO: send welcome message
-        try: 
-            status = users_elevated_priviledges[message.author.id].status
-        except: await message.channel.send("error")
-        else: 
-            await message.channel.send("Permissions granted, you can leave this server now")
-            dm = await message.author.create_dm()
-            await dm.send(
-                "Permissions granted. For aviable commands type .help"
-            )
+    if message.content.startswith(".grant"):
+        await get_permission_from_user(
+            user=message.author
+        )
+        await message.channel.send("Permissions granted, you can leave this server now")
+
 
     if message.content.startswith(".reactmsg"):
         text = message.content[10:]
@@ -81,24 +107,15 @@ async def on_message(message):
     if message.content.startswith(".enable") or message.content.startswith(".en"):
         try: await message.delete()
         except:pass
-        dm = await message.author.create_dm()
-        try: users_elevated_priviledges[message.author.id].status
-        except: 
-            await dm.send(
-                "Failed, permissions not granted\n"
-                "https://discord.gg/cgTQFtzrry"
-            )
-            #TODO: Change this message
-            return
-        users_enabled.add(message.author.id)
-        await dm.send("Enabled. To leave the list type .disable or .dis")
+        await enable_service_for_user(message.author)
 
     if message.content.startswith(".disable") or message.content.startswith(".dis"):
         try: await message.delete()
         except: pass
+        dm = await message.author.create_dm()
         try: users_enabled.remove(message.author.id)
-        except KeyError: await (await message.author.create_dm()).send("Already disabled.")
-        else: await (await message.author.create_dm()).send("Already disabled.")
+        except KeyError: await dm.send("Already disabled.")
+        else: await dm.send("Disabled.")
 
     if message.content.startswith(".match"):
         try: await message.delete()
@@ -111,8 +128,8 @@ async def on_message(message):
                 continue
             elif message.author.id in already_matched[stranger_id]:
                 continue
-            stranger=users_elevated_priviledges[stranger_id]
-            if not (str(stranger.status) == "online" or str(stranger.status) == "idle"):
+            stranger=user_id_to_priviledged_user[stranger_id]
+            if not str(stranger.status) in ("online", "idle"):
                 continue
             else:
                 already_matched[message.author.id].add(stranger)
@@ -162,6 +179,7 @@ async def on_message(message):
     #await message.channel.send(new_stderr.getvalue())
     #sys.stderr = old_stderr
 
-client.run(TOKEN)
+if __name__ == "__main__":
+    client.run(TOKEN)
 
 #https://discord.com/oauth2/authorize?client_id=738728621459505184&permissions=8&scope=bot
