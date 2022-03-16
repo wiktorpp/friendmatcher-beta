@@ -1,2 +1,1 @@
-#testbot23948
-TOKEN = "OTQ4ODU1NzkyMDc1OTU2MzA0.YiB40Q.aSZTySQ9zqTVYY4fvsvgR8aEH2Q"
+TOKEN="<token here>"
