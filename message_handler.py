@@ -1,9 +1,19 @@
+import random 
 import sys
-import io
 import traceback
-import textwrap
 
-import random
+print("Module message_handler has been loaded.")
+
+async def pager(string, function):
+    import textwrap
+    stringWrapped = textwrap.wrap(str(string), 2000, replace_whitespace=False)
+    for line in stringWrapped:
+        await function(line)
+
+users_enabled = set()
+user_id_to_priviledged_user = dict()
+already_matched = {}
+client = None
 
 async def add_user_to_database_if_not_already_there(user_id):
     global already_matched
@@ -79,7 +89,6 @@ async def match(me):
     await me.send("Noone seems to be online at the moment, please try again later.")
 
 async def on_message(message):
-    global client
     if message.author == client.user:
         return
     #if not message.content.startswith("/"):
@@ -98,13 +107,14 @@ async def on_message(message):
         )
         await message.channel.send("Permissions granted, you can leave this server now")
 
-
+    """
     if message.content.startswith(".reactmsg"):
         text = message.content[10:]
         message = await message.channel.send(text)
         global react_messages
         react_messages.append(message.id)
         #print(react_messages)
+    """
 
     if message.content.startswith(".help"):
         await message.channel.send(
@@ -128,8 +138,9 @@ async def on_message(message):
         try: await message.delete()
         except: pass
         await match(message.author)
-        
+
     if message.content.startswith("%"):
+        import io
         try:
             old_stdout = sys.stdout
             new_stdout = io.StringIO()
@@ -154,7 +165,7 @@ async def on_message(message):
             error = traceback.format_exc()
             await message.channel.send(error)
         else:
-            await message.channel.send(output)
+            await pager(output, message.channel.send)
 
     globals().update(locals())
 
