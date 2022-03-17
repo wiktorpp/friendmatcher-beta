@@ -13,7 +13,6 @@ async def pager(string, function):
 users_enabled = set()
 user_id_to_priviledged_user = dict()
 already_matched = {}
-client = None
 
 async def add_user_to_database_if_not_already_there(user_id):
     global already_matched
@@ -89,12 +88,6 @@ async def match(me):
     await me.send("Noone seems to be online at the moment, please try again later.")
 
 async def on_message(message):
-    if message.author == client.user:
-        return
-    #if not message.content.startswith("/"):
-    #    return
-    globals().update(locals())
-
     global users_enabled
     global user_id_to_priviledged_user
     global already_matched
@@ -150,6 +143,7 @@ async def on_message(message):
             progStrIndented = ""
             for i in progArr:
                 progStrIndented += "\n    " + i
+            globals().update(locals())
             exec(
                 "async def t():" +
                 progStrIndented +
