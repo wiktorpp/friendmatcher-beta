@@ -27,8 +27,6 @@ async def get_permission_from_user(user):
         file.write(str(user.id) + "\n")
 
     user_id_to_priviledged_user[user.id]=user
-    #print("success")
-    #print(user_id_to_priviledged_user)
     #TODO: send welcome message
 
     #will raise exception if getting permission failed
@@ -80,7 +78,7 @@ async def match(me):
             text = (
                 "You have been matched with {person}.\n"
                 "Also, you have been removed from the list of aviable users.\n"
-                "To enable it again, type .enable or .en"
+                "To enable aviability again, type .enable or .en"
             )
             await stranger.send(text.format(person=me))
             await me.send(text.format(person=stranger))
@@ -100,15 +98,6 @@ async def on_message(message):
         )
         await message.channel.send("Permissions granted, you can leave this server now")
 
-    """
-    if message.content.startswith(".reactmsg"):
-        text = message.content[10:]
-        message = await message.channel.send(text)
-        global react_messages
-        react_messages.append(message.id)
-        #print(react_messages)
-    """
-
     if message.content.startswith(".help"):
         await message.channel.send(
             "Aviable commands:\n"
@@ -117,17 +106,17 @@ async def on_message(message):
             ".match\n"
         )
 
-    if message.content.startswith(".enable") or message.content.startswith(".en"):
+    if message.content == ".enable" or message.content == ".en":
         try: await message.delete()
         except:pass
         await enable_service_for_user(message.author)
 
-    if message.content.startswith(".disable") or message.content.startswith(".dis"):
+    if message.content == ".disable" or message.content == ".dis":
         try: await message.delete()
         except: pass
         await disable_service_for_user(message.author)
 
-    if message.content.startswith(".match"):
+    if message.content == ".match":
         try: await message.delete()
         except: pass
         await match(message.author)
@@ -162,6 +151,3 @@ async def on_message(message):
             await pager(output, message.channel.send)
 
     globals().update(locals())
-
-    #await message.channel.send(new_stderr.getvalue())
-    #sys.stderr = old_stderr

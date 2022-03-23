@@ -22,9 +22,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
-        return
-        
     global message_handler
     if message.content == ".reload":
         users_enabled = message_handler.users_enabled
