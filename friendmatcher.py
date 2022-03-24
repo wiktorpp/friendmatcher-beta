@@ -17,11 +17,14 @@ already_matched = {}
 
 @client.event
 async def on_ready():
-    print("\033[31mLogged in as {0.user}\033[39m".format(client))
+    print(f"\033[31mLogged in as {client.user}\033[39m")
     message_handler.client = client
 
 @client.event
 async def on_message(message):
+    if message.author == client.user:
+        return
+        
     global message_handler
     if message.content == ".reload":
         users_enabled = message_handler.users_enabled

@@ -4,12 +4,17 @@ import random
 
 next_id = 0
 
+messages = []
+
 class Messageable:
     def __init__(self, name="Some user or channel"):
         self.name = name
 
     async def send(self, message):
-        print(f"Message to {self.name}> {message}")
+        print(f"\033[96mMessage to {self.name}\033[39m> {message}")
+        global messages
+        #print(len(messages))
+        messages.append(f"Message to {self.name}> {message}")
 
 class Member(Messageable):
     def __init__(
@@ -41,12 +46,45 @@ class Message:
         self.channel = channel
 
 async def main():
+    test = True
+
     global message_handler
-    people = {"John": Member(name="John")}
-    person = people["John"]
+    people = {
+        "john": Member(name="john"), 
+        "robert": Member(name="robert"), 
+        "alice": Member(name="alice"),
+        "zack": Member(name="zack"),
+        }
+    person = people["john"]
     channel = Messageable(name="channel")
+    if test:
+        try:
+            async def send(person, message):
+                print(f"\033[95m{person.name}\033[39m>{message}")
+                await message_handler.on_message(Message(person, message, channel))
+            from importlib import reload
+            message_handler = reload(message_handler)
+            for person in [Member(name="bob"), Member(name="alice"), Member(name="zack")]:
+                for message in [".grant", ".en", ".intro placeholder_intro"]:
+                    await send(person, message)
+            person = Member(name="robert")
+            for _ in range(4):
+                await send(person, ".match")
+
+            tests_passed = all((
+                "You have been matched" in messages[17],
+                "Noone seems to be online" in messages[18],
+                "placeholder_intro" in messages[15]
+            ))
+            if tests_passed:
+                print(f"\033[92mtest passed\033[39m")
+            else:
+                raise Exception
+        except:
+            print(f"\033[91mtest failed\033[39m")
+    person = people["john"]
     while True:
-        message = input(f"{person.name}>")
+        message = input(f"\033[95m{person.name}\033[39m>")
         if message.startswith("/"):
             argv = message.split(" ")
             if argv[0] == "/exit": exit()
@@ -57,21 +95,9 @@ async def main():
                     people.update({name: Member(name=name)})
                 else: 
                     name = argv[1]
-                person = people[name]
+                try: person = people[name]
+                except KeyError: print("Not found")
             if argv[0] == "/id": print(person.id)
-            if argv[0] == "/test":
-                from importlib import reload
-                message_handler = reload(message_handler)
-                bob = Member(name="bob")
-                alice = Member(name="alice")
-                person = bob
-                for message in [".grant", ".en", ".match"]:
-                    print(f"{person.name}>{message}")
-                    await message_handler.on_message(Message(person, message, channel))
-                person = alice
-                for message in [".grant", ".en", ".match"]:
-                    print(f"{person.name}>{message}")
-                    await message_handler.on_message(Message(person, message, channel))
         else:
             await message_handler.on_message(Message(person, message, channel))
 

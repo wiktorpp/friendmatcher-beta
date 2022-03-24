@@ -2,6 +2,8 @@ import random
 import sys
 import traceback
 
+from user import User
+
 print("Module message_handler has been loaded.")
 
 async def pager(string, function):
@@ -10,92 +12,19 @@ async def pager(string, function):
     for line in stringWrapped:
         await function(line)
 
-users_enabled = set()
-user_id_to_priviledged_user = dict()
-already_matched = {}
-
-async def add_user_to_database_if_not_already_there(user_id):
-    global already_matched
-    try: already_matched[user_id]
-    except KeyError:
-        already_matched[user_id] = set([user_id])
-
-async def get_permission_from_user(user):
-    global user_id_to_priviledged_user
-
-    with open("dm.txt", "a+") as file :
-        file.write(str(user.id) + "\n")
-
-    user_id_to_priviledged_user[user.id]=user
-    #TODO: send welcome message
-
-    #will raise exception if getting permission failed
-    user_id_to_priviledged_user[user.id].status
-    dm = await user.create_dm()
-    await dm.send(
-        "Permissions granted. For aviable commands type .help"
-    )
-
-async def enable_service_for_user(user):
-    global users_enabled
-    dm = await message.author.create_dm()
-    try: user_id_to_priviledged_user[message.author.id].status
-    except: 
-        await dm.send(
-            "Failed, permissions not granted\n"
-            "https://discord.gg/cgTQFtzrry"
-        )
-        #TODO: Change this message
-        return
-    users_enabled.add(user.id)
-    await dm.send("Enabled. To leave the list type .disable or .dis")
-
-async def disable_service_for_user(user):
-    global users_enabled
-    dm = await message.author.create_dm()
-    try: users_enabled.remove(message.author.id)
-    except KeyError: await dm.send("Already disabled.")
-    else: await dm.send("Disabled.")
-
-async def match(me):
-    global users_enabled
-    shuffled_users=list(users_enabled)
-    random.shuffle(shuffled_users)
-    for stranger_id in shuffled_users:
-        if stranger_id in already_matched[me.id]:
-            continue
-        elif me.id in already_matched[stranger_id]:
-            continue
-        stranger=user_id_to_priviledged_user[stranger_id]
-        if not str(stranger.status) in ("online", "idle"):
-            continue
-        else:
-            already_matched[me.id].add(stranger)
-            try: users_enabled.remove(me.id)
-            except: pass
-            try: users_enabled.remove(stranger_id)
-            except: pass
-            text = (
-                "You have been matched with {person}.\n"
-                "Also, you have been removed from the list of aviable users.\n"
-                "To enable aviability again, type .enable or .en"
-            )
-            await stranger.send(text.format(person=me))
-            await me.send(text.format(person=stranger))
-            return
-    await me.send("Noone seems to be online at the moment, please try again later.")
+users = dict()
+User.users = users
 
 async def on_message(message):
-    global users_enabled
-    global user_id_to_priviledged_user
-    global already_matched
+    global users
     
-    await add_user_to_database_if_not_already_there(message.author.id)
+    try:
+        self = users[message.author.id]
+    except KeyError:
+        self = users[message.author.id] = User(member=message.author)
 
     if message.content.startswith(".grant"):
-        await get_permission_from_user(
-            user=message.author
-        )
+        await self.store_permissions_for_user(message.author)
         await message.channel.send("Permissions granted, you can leave this server now")
 
     if message.content.startswith(".help"):
@@ -109,17 +38,31 @@ async def on_message(message):
     if message.content == ".enable" or message.content == ".en":
         try: await message.delete()
         except:pass
-        await enable_service_for_user(message.author)
+        await self.enable_service()
 
     if message.content == ".disable" or message.content == ".dis":
         try: await message.delete()
         except: pass
-        await disable_service_for_user(message.author)
+        await self.disable_service()
+    
+    if message.content.startswith(".intro"):
+        try: await message.delete()
+        except: pass
+        new_introduction = message.content[7:]
+        if len(new_introduction) == 0:
+            await self.dm(
+                "Your introduction is:\n"
+                f"{self.introduction}\n"
+                "To change your introduction, type \".intro <new intro>\""
+            )
+        else:
+            self.introduction = new_introduction
+            await self.dm("Ok")
 
     if message.content == ".match":
         try: await message.delete()
         except: pass
-        await match(message.author)
+        await self.match()
 
     if message.content.startswith("%"):
         import io
