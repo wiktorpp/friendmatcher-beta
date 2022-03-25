@@ -10,6 +10,8 @@ class Messageable:
     def __init__(self, name="Some user or channel"):
         self.name = name
 
+    def __str__(self): raise NotImplementedError
+
     async def send(self, message):
         print(f"\033[96mMessage to {self.name}\033[39m> {message}")
         global messages
@@ -17,11 +19,7 @@ class Messageable:
         messages.append(f"Message to {self.name}> {message}")
 
 class Member(Messageable):
-    def __init__(
-        self, 
-        id=None,
-        name=None
-        ):
+    def __init__(self, name=None, id=None):
         if id != None:
             self.id = id
         else: 
@@ -33,14 +31,13 @@ class Member(Messageable):
         self.status = "online"
         Messageable.__init__(self, name=name)
 
-    def __str__(self):
-        return self.name
+    def __str__(self): return self.name
 
     async def create_dm(self):
         return Messageable(name=self.name)
 
 class Message:
-    def __init__(self, author=None, message="message", channel=None):
+    def __init__(self, message="message", author=None, channel=None):
         self.content = message
         self.author = author
         self.channel = channel
@@ -50,10 +47,10 @@ async def main():
 
     global message_handler
     people = {
-        "john": Member(name="john"), 
-        "robert": Member(name="robert"), 
-        "alice": Member(name="alice"),
-        "zack": Member(name="zack"),
+        "john": Member("john"), 
+        "robert": Member("robert"), 
+        "alice": Member("alice"),
+        "zack": Member("zack"),
         }
     person = people["john"]
     channel = Messageable(name="channel")
@@ -61,13 +58,13 @@ async def main():
         try:
             async def send(person, message):
                 print(f"\033[95m{person.name}\033[39m>{message}")
-                await message_handler.on_message(Message(person, message, channel))
+                await message_handler.on_message(Message(message, person, channel))
             from importlib import reload
-            message_handler = reload(message_handler)
-            for person in [Member(name="bob"), Member(name="alice"), Member(name="zack")]:
+            #message_handler = reload(message_handler)
+            for person in [Member("bob"), Member("alice"), Member("zack")]:
                 for message in [".grant", ".en", ".intro placeholder_intro"]:
                     await send(person, message)
-            person = Member(name="robert")
+            person = Member("robert")
             for _ in range(4):
                 await send(person, ".match")
 
@@ -92,13 +89,13 @@ async def main():
             if argv[0] == "/su":
                 if argv[1] == "new":
                     name = argv[2]
-                    people.update({name: Member(name=name)})
+                    people.update({name: Member(name)})
                 else: 
                     name = argv[1]
                 try: person = people[name]
                 except KeyError: print("Not found")
             if argv[0] == "/id": print(person.id)
         else:
-            await message_handler.on_message(Message(person, message, channel))
+            await message_handler.on_message(Message(message, person, channel))
 
 asyncio.get_event_loop().run_until_complete(main())
