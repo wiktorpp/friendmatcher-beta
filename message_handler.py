@@ -6,12 +6,6 @@ from user import User
 
 print("Module message_handler has been loaded.")
 
-async def pager(string, function):
-    import textwrap
-    stringWrapped = textwrap.wrap(str(string), 2000, replace_whitespace=False)
-    for line in stringWrapped:
-        await function(line)
-
 users = dict()
 User.users = users
 
@@ -66,31 +60,43 @@ async def on_message(message):
 
     if message.content.startswith("%"):
         import io
+        import sys
+        import traceback
+        import textwrap
         try:
             old_stdout = sys.stdout
             new_stdout = io.StringIO()
             sys.stdout = new_stdout
 
-            progArr = message.content[1:].splitlines()
-            progStrIndented = ""
-            for i in progArr:
-                progStrIndented += "\n    " + i
-            globals().update(locals())
-            exec(
-                "async def t():" +
-                progStrIndented +
-                "\n    globals().update(locals())",
-                globals()
-            )
-            await t()
+            request = message.content[1:]
+            try:
+                exec(
+                    "async def request_funct():\n" +
+                    "    return_value = (" + request + ")" + "\n"
+                    "    globals().update(locals())\n"
+                    "    return return_value",
+                    globals()
+                )
+            except:
+                exec(
+                    "async def request_funct():\n" +
+                    "    " + request.replace("\n", "\n    ") + "\n"
+                    "    globals().update(locals())\n"
+                    "    return None",
+                    globals()
+                )
+            return_value = await request_funct()
 
             output = new_stdout.getvalue()
             sys.stdout = old_stdout
 
+            if return_value != None:
+                output = str(return_value) + "\n" + output
         except:
             error = traceback.format_exc()
             await message.channel.send(error)
         else:
-            await pager(output, message.channel.send)
+            for chunk in textwrap.wrap(output, 2000, replace_whitespace=False):
+                await message.channel.send(chunk)
 
     globals().update(locals())
