@@ -29,7 +29,7 @@ class Member(Messageable):
         if name == None:
             self.name = str(id)
         self.status = "online"
-        Messageable.__init__(self, name=name)
+        Messageable.__init__(self, name=f"{name}#0000")
 
     def __str__(self): return self.name
 
@@ -77,8 +77,10 @@ async def main():
                 print(f"\033[92mtest passed\033[39m")
             else:
                 raise Exception
-        except:
-            print(f"\033[91mtest failed\033[39m")
+        except Exception as exception:
+            print(f"\033[91mtest failed: {exception}\033[39m")
+            #raise exception
+
     person = people["john"]
     while True:
         message = input(f"\033[95m{person.name}\033[39m>")

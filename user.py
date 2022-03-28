@@ -1,5 +1,7 @@
 import random
 
+users = dict()
+
 class User:
     def __init__(self, member=None):
         self.member = member
@@ -8,15 +10,11 @@ class User:
         self.dm_channel = None
         self.introduction = "This user did not set their introduction."
 
-    """
-    def __eq__(self, other):
-        try:
-            return self.member.id == other.id
-            print(1)
-        except:
-            print(2)
-            return self.member.id == other.member.id
-    """
+    def __str__(self):
+        return str(self.member)
+
+    def __repr__(self):
+        return str(self.member)
 
     async def store_permissions_for_user(self, member):
         with open("dm.txt", "a+") as file :

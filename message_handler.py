@@ -98,5 +98,3 @@ async def on_message(message):
         else:
             for chunk in textwrap.wrap(output, 2000, replace_whitespace=False):
                 await message.channel.send(chunk)
-
-    globals().update(locals())
