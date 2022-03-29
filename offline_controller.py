@@ -15,7 +15,6 @@ class Messageable:
     async def send(self, message):
         print(f"\033[96mMessage to {self.name}\033[39m> {message}")
         global messages
-        #print(len(messages))
         messages.append(f"Message to {self.name}> {message}")
 
 class Member(Messageable):
@@ -79,7 +78,7 @@ async def main():
                 raise Exception
         except Exception as exception:
             print(f"\033[91mtest failed: {exception}\033[39m")
-            #raise exception
+            raise exception
 
     person = people["john"]
     while True:

@@ -2,20 +2,15 @@ import random
 import sys
 import traceback
 
-from user import User
+from user import User, users
 
 print("Module message_handler has been loaded.")
 
-users = dict()
-User.users = users
-
 async def on_message(message):
-    global users
-    
     try:
         self = users[message.author.id]
     except KeyError:
-        self = users[message.author.id] = User(member=message.author)
+        self = User(member=message.author)
 
     if message.content.startswith(".grant"):
         await self.store_permissions_for_user(message.author)

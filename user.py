@@ -9,6 +9,8 @@ class User:
         self.already_matched_with = {self}
         self.dm_channel = None
         self.introduction = "This user did not set their introduction."
+        global users
+        users.update({member.id: self})
 
     def __str__(self):
         return str(self.member)
@@ -57,7 +59,7 @@ class User:
             await self.dm("Already disabled.")
 
     async def match(self):
-        shuffled_users=list(self.users.values())
+        shuffled_users=list(users.values())
         random.shuffle(shuffled_users)
         for other in shuffled_users:
             if other.enabled != True:
