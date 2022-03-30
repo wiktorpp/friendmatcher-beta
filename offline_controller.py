@@ -78,7 +78,7 @@ async def main():
                 raise Exception
         except Exception as exception:
             print(f"\033[91mtest failed: {exception}\033[39m")
-            raise exception
+            #raise exception
 
     person = people["john"]
     while True:

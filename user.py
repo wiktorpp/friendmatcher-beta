@@ -2,6 +2,16 @@ import random
 
 users = dict()
 
+def get_user(member):
+    global users
+    try:
+        return users[member.id]
+    except KeyError:
+        users.update(
+            {member.id: User(member=member)}
+        )
+        return users[member.id]
+
 class User:
     def __init__(self, member=None):
         self.member = member
@@ -9,8 +19,6 @@ class User:
         self.already_matched_with = {self}
         self.dm_channel = None
         self.introduction = "This user did not set their introduction."
-        global users
-        users.update({member.id: self})
 
     def __str__(self):
         return str(self.member)
