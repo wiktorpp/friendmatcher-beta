@@ -1,6 +1,5 @@
 import asyncio
 import message_handler
-import random
 
 next_id = 0
 

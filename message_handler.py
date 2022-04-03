@@ -1,39 +1,31 @@
-import random 
-import sys
-import traceback
-
 from user import User, get_user
 
 print("Module message_handler has been loaded.")
 
 async def on_message(message):
+
     self = get_user(message.author)
 
     if message.content.startswith(".grant"):
         await self.store_permissions_for_user(message.author)
         await message.channel.send("Permissions granted, you can leave this server now")
 
-    if message.content.startswith(".help"):
+    elif message.content.startswith(".help"):
         await message.channel.send(
             "Aviable commands:\n"
             ".enable .en\n"
             ".disable .dis\n"
+            ".intro [introduction]\n"
             ".match\n"
         )
 
-    if message.content == ".enable" or message.content == ".en":
-        try: await message.delete()
-        except:pass
+    elif message.content == ".enable" or message.content == ".en":
         await self.enable_service()
 
-    if message.content == ".disable" or message.content == ".dis":
-        try: await message.delete()
-        except: pass
+    elif message.content == ".disable" or message.content == ".dis":
         await self.disable_service()
     
-    if message.content.startswith(".intro"):
-        try: await message.delete()
-        except: pass
+    elif message.content.startswith(".intro"):
         new_introduction = message.content[7:]
         if len(new_introduction) == 0:
             await self.dm(
@@ -45,12 +37,12 @@ async def on_message(message):
             self.introduction = new_introduction
             await self.dm("Ok")
 
-    if message.content == ".match":
+    elif message.content == ".match":
         try: await message.delete()
         except: pass
         await self.match()
 
-    if message.content.startswith("%"):
+    elif message.content.startswith("%"):
         import io
         import sys
         import traceback

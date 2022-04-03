@@ -33,7 +33,7 @@ class User:
         try: member.status
         except AttributeError: 
             await (await member.create_dm()).send(
-                "Unknown error occurred."
+                "Unknown error occurred. (This command does not work in DMs)"
             )
         else:
             self.member = member
@@ -52,7 +52,7 @@ class User:
         except: 
             await self.dm(
                 "Failed, permissions not granted\n"
-                "https://discord.gg/cgTQFtzrry"
+                "https://discord.gg/xxxxxxxxxx"
             )
             #TODO: Change this message
         else: 

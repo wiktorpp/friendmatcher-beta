@@ -2,18 +2,14 @@ import discord
 from TOKEN import TOKEN
 
 import message_handler
-import traceback
+
 from importlib import reload
+import traceback
 
 intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
-
 client = discord.Client(intents=intents)
-
-users_enabled = set()
-user_id_to_priviledged_user = dict()
-already_matched = {}
 
 @client.event
 async def on_ready():
