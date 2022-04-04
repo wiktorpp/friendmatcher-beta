@@ -35,7 +35,7 @@ async def on_message(message):
             )
         else:
             self.introduction = new_introduction
-            await self.dm("Ok")
+            await self.dm("Changed")
 
     elif message.content == ".match":
         try: await message.delete()
@@ -53,6 +53,7 @@ async def on_message(message):
             sys.stdout = new_stdout
 
             request = message.content[1:]
+            request_funct = None #Avoids request_funct not defined
             try:
                 exec(
                     "async def request_funct():\n" +

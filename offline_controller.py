@@ -18,6 +18,7 @@ class Messageable:
 
 class Member(Messageable):
     def __init__(self, name=None, id=None):
+        Messageable.__init__(self, name=None)
         if id != None:
             self.id = id
         else: 
@@ -25,9 +26,10 @@ class Member(Messageable):
             self.id = next_id
             next_id += 1
         if name == None:
-            self.name = str(id)
+            self.name = f"{self.id}#0000"
+        else:
+            self.name = f"{name}#0000"
         self.status = "online"
-        Messageable.__init__(self, name=f"{name}#0000")
 
     def __str__(self): return self.name
 
@@ -57,8 +59,6 @@ async def main():
             async def send(person, message):
                 print(f"\033[95m{person.name}\033[39m>{message}")
                 await message_handler.on_message(Message(message, person, channel))
-            from importlib import reload
-            #message_handler = reload(message_handler)
             for person in [Member("bob"), Member("alice"), Member("zack")]:
                 for message in [".grant", ".en", ".intro placeholder_intro"]:
                     await send(person, message)
