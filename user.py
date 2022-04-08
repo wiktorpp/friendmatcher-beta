@@ -2,6 +2,33 @@ import random
 
 users = dict()
 
+class Tags:
+    def __init__(self, am=None, looking_for=None, block=None):
+        if am == None: self.am = set()
+        else: self.am = set(am)
+
+        if looking_for == None: self.looking_for = set()
+        else: self.looking_for = set(looking_for)
+
+        if block == None: self.block = set()
+        else: self.block = set(block)
+    
+    def __repr__(self):
+        return f"Tags(am={self.am}, looking_for={self.looking_for}, block={self.block})"
+    
+    def __str__(self):
+        result = ""
+        for tag in self.am:
+            result += f"<{tag} "
+        for tag in self.looking_for:
+            result += f">{tag} "
+        for tag in self.block:
+            result += f"#{tag} "
+        return result
+    
+    def calculate_weight(self, other):
+        pass
+
 def get_user(member):
     global users
     try:
@@ -88,7 +115,7 @@ class User:
                     "To enable aviability again, type .enable or .en\n\n"
                     "{introduction}"
                 )
-                await other.dm(text.format(person=self.member, introduction=self.introduction))
-                await self.dm(text.format(person=other.member, introduction=other.introduction))
+                await other.dm(text.format(person=self, introduction=self.introduction))
+                await self.dm(text.format(person=other, introduction=other.introduction))
                 return
         await self.dm("Noone seems to be online at the moment, please try again later.")
