@@ -17,13 +17,46 @@ class Tags:
         return f"Tags(am={self.am}, looking_for={self.looking_for}, block={self.block})"
     
     def __str__(self):
-        result = ""
+        dictionary = dict()
         for tag in self.am:
-            result += f"<{tag} "
+            try: dictionary[tag][0] = True
+            except KeyError: dictionary[tag] = [True, False, False]
         for tag in self.looking_for:
-            result += f">{tag} "
+            try: dictionary[tag][1] = True
+            except KeyError: dictionary[tag] = [False, True, False]
         for tag in self.block:
-            result += f"#{tag} "
+            try: dictionary[tag][2] = True
+            except KeyError: dictionary[tag] = [False, False, True]
+        result = ""
+        for key, value in dictionary.items():
+            tag = ""
+            if value[0]:
+                tag += "<"
+            if value[1]:
+                tag += ">"
+            if value[2]:
+                tag += "#"
+            tag += key
+            result += f"{tag} "
+        return result
+
+    def add_from_str(self, string):
+        tags = string.split(" ")
+        for tag in tags:
+            if "<" in tag or ">" in tag or "#" in tag:
+                if "<" in tag:
+                    self.am.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                if ">" in tag:
+                    self.looking_for.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                if "#" in tag:
+                    self.block.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+            else:
+                self.am.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                self.looking_for.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+
+    def from_str(string):
+        result = Tags()
+        result.add_from_str(string)
         return result
     
     def calculate_weight(self, other):
