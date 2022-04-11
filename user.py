@@ -31,9 +31,9 @@ class Tags:
         for key, value in dictionary.items():
             tag = ""
             if value[0]:
-                tag += "<"
-            if value[1]:
                 tag += ">"
+            if value[1]:
+                tag += "<"
             if value[2]:
                 tag += "#"
             tag += key
@@ -43,16 +43,16 @@ class Tags:
     def add_from_str(self, string):
         tags = string.split(" ")
         for tag in tags:
-            if "<" in tag or ">" in tag or "#" in tag:
-                if "<" in tag:
-                    self.am.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+            if ">" in tag or "<" in tag or "#" in tag:
                 if ">" in tag:
-                    self.looking_for.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                    self.am.add(tag.replace(">", "").replace("<", "").replace("#", ""))
+                if "<" in tag:
+                    self.looking_for.add(tag.replace(">", "").replace("<", "").replace("#", ""))
                 if "#" in tag:
-                    self.block.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                    self.block.add(tag.replace(">", "").replace("<", "").replace("#", ""))
             else:
-                self.am.add(tag.replace("<", "").replace(">", "").replace("#", ""))
-                self.looking_for.add(tag.replace("<", "").replace(">", "").replace("#", ""))
+                self.am.add(tag.replace(">", "").replace("<", "").replace("#", ""))
+                self.looking_for.add(tag.replace(">", "").replace("<", "").replace("#", ""))
 
     def from_str(string):
         result = Tags()
@@ -60,7 +60,20 @@ class Tags:
         return result
     
     def calculate_weight(self, other):
-        pass
+        result = 0
+        for tag in self.looking_for:
+            if tag in other.am:
+                result += 1
+        return result
+
+    def test():
+        self = Tags.from_str("<tag ")
+        other = Tags.from_str(">tag")
+        passed = self.calculate_weight(other)
+        if passed:
+            print(f"\033[92mTags test passed\033[39m")
+        else:
+            print(f"\033[91mTags test failed\033[39m")
 
 def get_user(member):
     global users
@@ -152,3 +165,6 @@ class User:
                 await self.dm(text.format(person=other, introduction=other.introduction))
                 return
         await self.dm("Noone seems to be online at the moment, please try again later.")
+
+if __name__ == "__main__":
+    Tags.test()
