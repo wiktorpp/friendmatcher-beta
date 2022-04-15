@@ -59,17 +59,31 @@ class Tags:
         result.add_from_str(string)
         return result
     
+    class Blocked(Exception):
+        pass
+
     def calculate_weight(self, other):
         result = 0
         for tag in self.looking_for:
             if tag in other.am:
                 result += 1
+        for tag in self.block:
+            if tag in other.am:
+                raise self.Blocked
         return result
 
     def test():
-        self = Tags.from_str("<tag ")
-        other = Tags.from_str(">tag")
-        passed = self.calculate_weight(other)
+        self = Tags.from_str("<1 <2 <3 >4")
+        other = Tags.from_str(">1 >2")
+        passed = self.calculate_weight(other) == 2
+        self = Tags.from_str("#blocked")
+        other = Tags.from_str(">blocked")
+        try:
+            self.calculate_weight(other)
+        except self.Blocked:
+            passed = passed and True
+        else:
+            passed = False
         if passed:
             print(f"\033[92mTags test passed\033[39m")
         else:
