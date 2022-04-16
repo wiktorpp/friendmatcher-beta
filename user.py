@@ -40,6 +40,26 @@ class Tags:
             result += f"{tag} "
         return result
 
+    def __len__(self):
+        return len(self.am) + len(self.looking_for) + len(self.block)
+    
+    def __contains__(self, tag):
+        return tag in self.am or tag in self.looking_for or tag in self.block
+
+    def __add__(self, other):
+        return Tags(
+            am=set.union(self.am, other.am),
+            looking_for=set.union(self.looking_for, other.looking_for),
+            block=set.union(self.block, other.block)
+        )
+    
+    def __sub__(self, other):
+        return Tags(
+            am=self.am.difference(other.am),
+            looking_for=self.looking_for.difference(other.looking_for),
+            block=self.block.difference(other.block)
+        )
+
     def add_from_str(self, string):
         tags = string.split(" ")
         for tag in tags:
@@ -182,3 +202,5 @@ class User:
 
 if __name__ == "__main__":
     Tags.test()
+    import pdb
+    pdb.set_trace()
