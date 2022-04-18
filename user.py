@@ -59,9 +59,18 @@ class Tags:
             looking_for=self.looking_for.difference(other.looking_for),
             block=self.block.difference(other.block)
         )
+    
+    def __eq__(self, other):
+        return all((
+            self.am == other.am,
+            self.looking_for == other.looking_for,
+            self.block == other.block
+        ))
 
     def add_from_str(self, string):
         tags = string.split(" ")
+        try: tags.remove("")
+        except ValueError: pass
         for tag in tags:
             if ">" in tag or "<" in tag or "#" in tag:
                 if ">" in tag:
@@ -132,6 +141,12 @@ class User:
 
     def __repr__(self):
         return str(self.member)
+    
+    def __eq__(self, other):
+        try:
+            return self.member.id == other.member.id
+        except KeyError:
+            return self.member.id == other.id
 
     async def store_permissions_for_user(self, member):
         with open("dm.txt", "a+") as file :
