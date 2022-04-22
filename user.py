@@ -132,14 +132,12 @@ class User:
     def __init__(self, member=None):
         self.member = member
         self.enabled = False
-        self.already_matched_with = {self}
+        self.already_matched_with = {self.member.id}
         self.dm_channel = None
+        self.tags = Tags()
         self.introduction = "This user did not set their introduction."
 
     def __str__(self):
-        return str(self.member)
-
-    def __repr__(self):
         return str(self.member)
     
     def __eq__(self, other):
@@ -194,14 +192,14 @@ class User:
         for other in shuffled_users:
             if other.enabled != True:
                 continue
-            elif other in self.already_matched_with:
+            elif other.member.id in self.already_matched_with:
                 continue
-            elif self in other.already_matched_with:
+            elif self.member.id in other.already_matched_with:
                 continue
             elif not str(other.member.status) in ("online", "idle"):
                 continue
             else:
-                self.already_matched_with.add(other)
+                self.already_matched_with.add(other.member.id)
                 self.enabled = False
                 other.enabled = False
                 text = (
