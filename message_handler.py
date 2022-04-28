@@ -16,6 +16,7 @@ async def on_message(message):
             ".enable .en\n"
             ".disable .dis\n"
             ".intro [introduction]\n"
+            ".tags <add | del | show>"
             ".match\n"
         )
 
@@ -36,6 +37,19 @@ async def on_message(message):
         else:
             self.introduction = new_introduction
             await self.dm("Changed")
+
+    elif message.content.startswith(".tags"):
+        if message.content.startswith(".tags add"):
+            self.tags.add_from_str(message.content[9:])
+            await self.dm("Added")
+        elif message.content.startswith(".tags del"):
+            pass
+        elif message.content.startswith(".tags show"):
+            await self.dm(str(self.tags))
+        elif message.content == ".tags":
+            await self.dm(str(self.tags))
+        else:
+            await self.dm("Invalid command")
 
     elif message.content == ".match":
         try: await message.delete()
