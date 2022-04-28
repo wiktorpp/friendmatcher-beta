@@ -72,9 +72,8 @@ class User:
             await self.dm("Already disabled.")
 
     async def match(self):
-        shuffled_users=list(users.values())
-        random.shuffle(shuffled_users)
-        for other in shuffled_users:
+        possible_matches = dict()
+        for other in users.values():
             if other.enabled != True:
                 continue
             elif other.member.id in self.already_matched_with:
@@ -84,19 +83,31 @@ class User:
             elif not str(other.member.status) in ("online", "idle"):
                 continue
             else:
-                self.already_matched_with.add(other.member.id)
-                self.enabled = False
-                other.enabled = False
-                text = (
-                    "You have been matched with {person}.\n"
-                    "Also, you have been removed from the list of aviable users.\n"
-                    "To enable aviability again, type .enable or .en\n\n"
-                    "{introduction}"
-                )
-                await other.dm(text.format(person=self, introduction=self.introduction))
-                await self.dm(text.format(person=other, introduction=other.introduction))
-                return
-        await self.dm("Noone seems to be online at the moment, please try again later.")
+                weight = self.tags.calculate_weight(other.tags) + other.tags.calculate_weight(self.tags)
+                while True:
+                    try: possible_matches[weight]
+                    except KeyError:
+                        possible_matches[weight] = other
+                        break
+                    else:
+                        weight -= 1
+
+        try:
+            match = possible_matches[max(possible_matches.keys())]
+        except ValueError: 
+            await self.dm("Noone seems to be online at the moment, please try again later.")
+        else:
+            self.already_matched_with.add(match.member.id)
+            self.enabled = False
+            match.enabled = False
+            text = (
+                "You have been matched with {person}.\n"
+                "Also, you have been removed from the list of aviable users.\n"
+                "To enable aviability again, type .enable or .en\n\n"
+                "{introduction}"
+            )
+            await match.dm(text.format(person=self, introduction=self.introduction))
+            await self.dm(text.format(person=match, introduction=match.introduction))
 
 if __name__ == "__main__":
     Tags.test()
