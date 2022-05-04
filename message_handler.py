@@ -40,8 +40,9 @@ async def on_message(message):
 
     elif message.content.startswith(".tags"):
         if message.content.startswith(".tags add"):
-            self.tags.add_from_str(message.content[9:])
-            await self.dm("Added")
+            try: self.tags.add_from_str(message.content[9:])
+            except ValueError: await self.dm("Invalid value")
+            else: await self.dm("Added")
         elif message.content.startswith(".tags del"):
             pass
         elif message.content.startswith(".tags show"):
