@@ -1,4 +1,4 @@
-from user import User, get_user
+from user import User, get_user, users
 
 print("Module message_handler has been loaded.")
 
@@ -16,7 +16,7 @@ async def on_message(message):
             ".enable .en\n"
             ".disable .dis\n"
             ".intro [introduction]\n"
-            ".tags <add | del | show>"
+            ".tags <add | del | show>\n"
             ".match\n"
         )
 
@@ -46,9 +46,15 @@ async def on_message(message):
         elif message.content.startswith(".tags del"):
             pass
         elif message.content.startswith(".tags show"):
-            await self.dm(str(self.tags))
+            if len(str(self.tags)) != 0:
+                await self.dm(str(self.tags))
+            else:
+                await self.dm("No tags specified")
         elif message.content == ".tags":
-            await self.dm(str(self.tags))
+            if len(str(self.tags)) != 0:
+                await self.dm(str(self.tags))
+            else:
+                await self.dm("No tags specified")
         else:
             await self.dm("Invalid command")
 
@@ -57,6 +63,15 @@ async def on_message(message):
         except: pass
         await self.match()
 
+    elif message.content == ".DUMPANDEXIT":
+        users = dict()
+        for user in users:
+            users.update({user.member.id: user.member})
+
+        await self.dm(self.to_dict())
+        exit()
+
+"""
     elif message.content.startswith("%"):
         import io
         import sys
@@ -98,3 +113,4 @@ async def on_message(message):
         else:
             for chunk in textwrap.wrap(output, 2000, replace_whitespace=False):
                 await message.channel.send(chunk)
+"""
