@@ -22,7 +22,18 @@ class User:
         self.tags = Tags()
         self.introduction = "This user did not set their introduction."
 
+    def to_dict(self):
+        return {
+            "enabled": self.enabled,
+            "already_matched_with": self.already_matched_with,
+            "tags": self.tags,
+            "introduction": self.introduction,
+        }
+
     def __str__(self):
+        return str(self.member)
+
+    def __repr__(self):
         return str(self.member)
     
     def __eq__(self, other):
@@ -32,7 +43,7 @@ class User:
             return self.member.id == other.id
 
     async def store_permissions_for_user(self, member):
-        with open("dm.txt", "a+") as file :
+        with open("dm.txt", "a+") as file:
             file.write(f"{member.id}\n")
 
         try: member.status
