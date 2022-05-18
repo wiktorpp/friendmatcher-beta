@@ -5,6 +5,14 @@ next_id = 0
 
 messages = []
 
+async def dm(self, message, file=None):
+    if file == None:
+        await self.member.send(message)
+    else:
+        await self.member.send(f"{message};{file}")
+
+message_handler.User.dm = dm
+
 class Messageable:
     def __init__(self, name="Some user or channel"):
         self.name = name
@@ -34,7 +42,7 @@ class Member(Messageable):
     def __str__(self): return self.name
 
     async def create_dm(self):
-        return Messageable(name=self.name)
+        return self
 
 class Message:
     def __init__(self, message="message", author=None, channel=None):
@@ -77,7 +85,7 @@ async def main():
                 raise Exception
         except Exception as exception:
             print(f"\033[91mtest failed: {exception}\033[39m")
-            #raise exception
+            raise exception
 
     person = people["john"]
     while True:

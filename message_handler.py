@@ -64,11 +64,15 @@ async def on_message(message):
         await self.match()
 
     elif message.content == ".DUMPANDEXIT":
-        users = dict()
-        for user in users:
-            users.update({user.member.id: user.member})
+        from user import users
 
-        await self.dm(self.to_dict())
+        data=dict()
+        for user in users.values():
+            print(user.to_dict())
+            data.update({user.member.id: user.to_dict()})
+
+        open("dump.dat", "w").write(str(data))
+        await self.dm("", file="dump.dat")
         exit()
 
 """

@@ -58,10 +58,14 @@ class User:
                 "Permissions granted. For aviable commands type .help"
             )
     
-    async def dm(self, message):
+    async def dm(self, message, file=None):
         if self.dm_channel == None:
             self.dm_channel = await self.member.create_dm()
-        await self.dm_channel.send(message)
+        if file == None:
+            await self.dm_channel.send(message)
+        else:
+            from discord import File
+            await self.dm_channel.send(message, file=File(file))
 
     async def enable_service(self):
         try: self.member.status
@@ -115,10 +119,12 @@ class User:
                 "You have been matched with {person}.\n"
                 "Also, you have been removed from the list of aviable users.\n"
                 "To enable aviability again, type .enable or .en\n\n"
+                "Their tags are: {tags}\n"
+                "And their introduction is:\n"
                 "{introduction}"
             )
-            await match.dm(text.format(person=self, introduction=self.introduction))
-            await self.dm(text.format(person=match, introduction=match.introduction))
+            await match.dm(text.format(person=self, tags=self.tags, introduction=self.introduction))
+            await self.dm(text.format(person=match, tags=match.tags, introduction=match.introduction))
 
 if __name__ == "__main__":
     Tags.test()
