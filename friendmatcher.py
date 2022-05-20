@@ -23,6 +23,7 @@ async def on_message(message):
         
     global message_handler
     if message.content == ".reload":
+        return
         users_enabled = message_handler.users_enabled
         user_id_to_priviledged_user = message_handler.user_id_to_priviledged_user
         already_matched = message_handler.already_matched
@@ -36,7 +37,7 @@ async def on_message(message):
             await message_handler.on_message(message)
         except:
             error = traceback.format_exc()
-            await message.channel.send(error)
+            await message.channel.send(f"```\n{error}\n```")
 
 if __name__ == "__main__":
     client.run(TOKEN)
