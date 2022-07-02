@@ -13,6 +13,8 @@ async def dm(self, message, file=None):
 
 message_handler.User.dm = dm
 
+message_handler.privileged_users = {0}
+
 class Messageable:
     def __init__(self, name="Some user or channel"):
         self.name = name
