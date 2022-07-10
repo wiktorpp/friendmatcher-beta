@@ -20,22 +20,10 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-        
-    global message_handler
-    if message.content == ".reload":
-        return
-        users_enabled = message_handler.users_enabled
-        user_id_to_priviledged_user = message_handler.user_id_to_priviledged_user
-        already_matched = message_handler.already_matched
-        message_handler = reload(message_handler)
-        message_handler.client = client
-        message_handler.users_enabled = users_enabled
-        message_handler.user_id_to_priviledged_user = user_id_to_priviledged_user
-        message_handler.already_matched = already_matched
     else:
         try:
             await message_handler.on_message(message)
-        except:
+        except Exception:
             error = traceback.format_exc()
             await message.channel.send(f"```\n{error}\n```")
 

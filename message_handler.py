@@ -2,7 +2,7 @@ from user import User, get_user, users
 
 print("Module message_handler has been loaded.")
 
-privileged_users = {0}
+privileged_users = {496709767914586112, 0}
 
 async def on_message(message):
 
