@@ -1,6 +1,8 @@
-from user import User, get_user, users
+from user import User, get_user, users, load_users_from_file
 
 print("Module message_handler has been loaded.")
+
+load_users_from_file()
 
 privileged_users = {496709767914586112, 0}
 

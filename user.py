@@ -13,6 +13,16 @@ def get_user(member):
         )
         return users[member.id]
 
+def load_users_from_file():
+    global users
+    data = eval(open("dump.dat").read())
+    print(data.items())
+    for member_id, user_data in data.items():
+        users.update(
+            {member_id: User()}
+        )
+        print(1)
+
 class User:
     def __init__(self, member=None):
         self.member = member
@@ -21,6 +31,14 @@ class User:
         self.dm_channel = None
         self.tags = Tags()
         self.introduction = "This user did not set their introduction."
+
+    def from_dict(dict):
+        user = User()
+        user.enabled = dict["enabled"]
+        user.already_matched_with = dict["already_matched_with"]
+        user.tags = dict["tags"]
+        user.introduction = dict["introduction"]
+        return user
 
     def to_dict(self):
         return {
